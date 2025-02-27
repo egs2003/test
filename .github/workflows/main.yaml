@@ -4,10 +4,11 @@ on:
   #push:  # Wird bei jedem Push ausgelöst
   #workflow_dispatch:
   schedule:
-    - cron: */5 * * * *
+    - cron: '*/5 * * * *'
 permissions: 
   contents: write  # GitHub Actions darf ins Repo schreiben
 jobs:
+  test:
   bump-version:
     runs-on: windows-latest
     steps:
