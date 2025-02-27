@@ -3,9 +3,10 @@ name: Erhöhe Versionsnummer unter Windows
 on: 
   push:  # Wird bei jedem Push ausgelöst
   workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'  # Führt den Workflow alle 30 Minuten aus
 permissions: 
   contents: write  # GitHub Actions darf ins Repo schreiben
-
 jobs:
   bump-version:
     runs-on: windows-latest
