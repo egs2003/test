@@ -1,0 +1,13 @@
+name: Mein erster Workflow
+
+on: push  # Workflow wird bei jedem Push ausgelöst
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+      
+      - name: "Hallo Welt ausgeben"
+        run: echo "Hallo, GitHub Actions!"
