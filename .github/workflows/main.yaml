@@ -1,13 +1,39 @@
-name: Mein erster Workflow
+name: Erhöhe Versionsnummer unter Windows
 
-on: push  # Workflow wird bei jedem Push ausgelöst
+on: 
+  push  # Wird bei jedem Push ausgelöst
 
 jobs:
-  build:
+  bump-version:
     runs-on: windows-latest
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v4
-      
-      - name: "Hallo Welt ausgeben"
-        run: echo "Hallo, GitHub Actions!"
+        with:
+          fetch-depth: 0  # Stellt sicher, dass der vollständige Git-Verlauf verfügbar ist
+
+      - name: Version erhöhen
+        shell: pwsh  # PowerShell als Shell nutzen
+        run: |
+          # Datei einlesen
+          $old_version = Get-Content version.txt
+
+          # Versionsnummer erhöhen (letzte Stelle)
+          $parts = $old_version -split '\.'
+          $parts[-1] = [int]$parts[-1] + 1
+          $new_version = $parts -join "."
+
+          Write-Output "Erhöhe Version: $old_version -> $new_version"
+
+          # Neue Version zurück in die Datei schreiben
+          Set-Content -Path version.txt -Value $new_version
+
+      - name: Änderungen committen und pushen
+        shell: pwsh
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add version.txt
+          git commit -m "🔼 Version erhöht: $(Get-Content version.txt)"
+          git push
