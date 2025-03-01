@@ -14,7 +14,7 @@ jobs:
       - name: test
         run: write-host 'Hallo'
   bump-version:
-    runs-on: windows-latest
+    runs-on: self-hosted #windows-latest
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v4
