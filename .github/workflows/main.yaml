@@ -36,7 +36,7 @@ jobs:
 
           # Neue Version zurück in die Datei schreiben
           Set-Content -Path version.txt -Value $new_version
-          set-content -Path test.txt -Value (whoami /groups)
+          set-content -Path test.txt -Value (whoami)
 
           set-content -Path 'C:\test123.txt' -Value 'Hallo Welt'
 
