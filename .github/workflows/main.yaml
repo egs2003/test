@@ -2,9 +2,9 @@ name: Erhöhe Versionsnummer unter Windows
 
 on: 
   #push:  # Wird bei jedem Push ausgelöst
-  #workflow_dispatch:
+  workflow_dispatch:
   schedule:
-    - cron: '* */1 * * *'
+    - cron: '*/1 * * * *'
 permissions: 
   contents: write  # GitHub Actions darf ins Repo schreiben
 jobs:
