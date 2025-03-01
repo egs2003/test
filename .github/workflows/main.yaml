@@ -9,7 +9,7 @@ permissions:
   contents: write  # GitHub Actions darf ins Repo schreiben
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: self-hosted #windows-latest
     steps:
       - name: test
         run: write-host 'Hallo'
