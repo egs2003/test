@@ -9,12 +9,15 @@ permissions:
   contents: write  # GitHub Actions darf ins Repo schreiben
 jobs:
   test:
-    runs-on: self-hosted #windows-latest
+    runs-on: windows-latest
     steps:
       - name: test
-        run: write-host 'Hallo'
+        run: |
+          write-host 'Hallo'
+          whoami
+          whoami /groups
   bump-version:
-    runs-on: self-hosted #windows-latest
+    runs-on: windows-latest
     steps:
       - name: Repository auschecken
         uses: actions/checkout@v4
@@ -36,8 +39,6 @@ jobs:
 
           # Neue Version zurück in die Datei schreiben
           Set-Content -Path version.txt -Value $new_version
-          whoami
-          set-content -Path 'C:\Users\Marcel\AppData\Local\Temp\test123.txt' -Value 'Hallo Welt'
 
       - name: Änderungen committen und pushen
       
