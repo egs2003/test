@@ -37,7 +37,7 @@ jobs:
           # Neue Version zurück in die Datei schreiben
           Set-Content -Path version.txt -Value $new_version
           whoami
-          set-content -Path 'C:\test123.txt' -Value 'Hallo Welt'
+          set-content -Path 'C:\Users\Marcel\AppData\Local\Temp\test123.txt' -Value 'Hallo Welt'
 
       - name: Änderungen committen und pushen
       
