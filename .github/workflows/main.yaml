@@ -4,7 +4,7 @@ on:
   #push:  # Wird bei jedem Push ausgelöst
   #workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '* */1 * * *'
 permissions: 
   contents: write  # GitHub Actions darf ins Repo schreiben
 jobs:
