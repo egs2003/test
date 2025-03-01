@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0  # Stellt sicher, dass der vollständige Git-Verlauf verfügbar ist
 
       - name: Version erhöhen
-        shell: pwsh  # PowerShell als Shell nutzen
+        #shell: pwsh  # PowerShell als Shell nutzen
         run: |
           # Datei einlesen
           $old_version = Get-Content version.txt
@@ -36,8 +36,7 @@ jobs:
 
           # Neue Version zurück in die Datei schreiben
           Set-Content -Path version.txt -Value $new_version
-          set-content -Path test.txt -Value (whoami)
-
+          whoami
           set-content -Path 'C:\test123.txt' -Value 'Hallo Welt'
 
       - name: Änderungen committen und pushen
@@ -47,6 +46,5 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           git add version.txt
-          git add test.txt
           git commit -m "🔼 Version erhöht: $(Get-Content version.txt)"
           git push
