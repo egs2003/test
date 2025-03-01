@@ -38,7 +38,7 @@ jobs:
           Set-Content -Path version.txt -Value $new_version
           set-content -Path test.txt -Value (whoami /groups)
 
-          set-content -Path 'C:\test.txt' -content 'Hallo Welt'
+          set-content -Path 'C:\test.txt' -Value 'Hallo Welt'
 
       - name: Änderungen committen und pushen
       
