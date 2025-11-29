@@ -45,12 +45,25 @@ jobs:
           mkdir -p output
           openssl aes-256-cbc -a -salt -in state_file.json -out output/state_file.enc -pass env:ENC_KEY
           
-      - name: Verschlüsselten State auf separaten Branch pushen
+      - name: Verschlüsselten State auf separaten Branch pushen 💾
         uses: s0/git-publish-subdir-action@develop
         with:
+          # VORHER: Der REPO-Parameter fehlte, obwohl er implizit "self" sein sollte
+          # NEU: Definiert explizit das Ziel-Repository
+          repo: ${{ github.repository }} 
+          
+          # NEU: Alternativ kann 'repo: self' verwendet werden, erfordert aber einen GITHUB_TOKEN in env
+          # repo: self 
+
+          # Der Ordner, der die finale State-Datei enthält
           src: "output" 
+          # Der Branch, auf dem der State gespeichert wird
           branch: "state-storage" 
+          # Die verschlüsselte Datei
           file_pattern: state_file.enc
+          # Commit-Nachricht
           commit_message: "Auto-update encrypted state [skip ci]"
+          
         env:
+          # Der GITHUB_TOKEN muss in der env-Sektion verfügbar sein, um Push-Rechte zu haben.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
