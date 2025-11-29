@@ -17,23 +17,26 @@ jobs:
   # Job 1: Alten State holen, entschlüsseln und Vorprüfung durchführen
   prepare_assessment:
     runs-on: self-hosted
+    outputs: 
+      state_available: ${{ steps.fetch_state.outputs.state_available }}
     steps:
       - name: Code auschecken
         uses: actions/checkout@v4
         
       - name: Alten State holen & entschlüsseln
         run: |
-          # 1. Branch holen
           git fetch origin state-storage:state-storage || true
-          # 2. Verschlüsselte Datei auschecken. Fehlende Datei wird ignoriert.
           git checkout state-storage -- state_file.enc 2>/dev/null || true
           git checkout main 
 
-          # 3. Entschlüsseln, falls state_file.enc existiert
           if [ -f state_file.enc ]; then
             echo "Alten State entschlüsselt."
             openssl aes-256-cbc -d -a -in state_file.enc -out state_file.json -pass env:ENC_KEY
             rm state_file.enc
+            echo "state_available=true" >> $GITHUB_OUTPUT
+          else 
+            echo "Keine verschlüsselte Datei gefunden. State NICHT verfügbar (Erster Lauf)."
+            echo "state_available=false" >> $GITHUB_OUTPUT
           fi
           
       - name: Vorprüfung (Einschätzung) durchführen
@@ -41,6 +44,7 @@ jobs:
         run: echo "test" > assessment.txt
         
       - name: Klartext State hochladen (Für den nächsten Job)
+        if: steps.fetch_state.outputs.state_available == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: klartext-state
@@ -78,12 +82,14 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Klartext-State herunterladen (vom Job 1)
+        if: needs.prepare_assessment.outputs.state_available == 'true'
         uses: actions/download-artifact@v4
         with:
           name: klartext-state
           path: .
           
       - name: Zustand für Vergleich speichern
+        if: needs.prepare_assessment.outputs.state_available == 'true'
         # Der heruntergeladene Zustand (state_file.json) ist der ALTE Zustand.
         # Wir speichern ihn, bevor das Kompilierungsskript ihn verändert.
         run: cp state_file.json old_state_for_comparison.json
