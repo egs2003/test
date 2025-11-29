@@ -53,7 +53,7 @@ jobs:
           git checkout state-storage || git checkout --orphan state-storage
           
           git add LastResult.md
-          git commit -m "Vorprüfung [skip ci]"
+          git commit -m "Vorprüfung"
           
           git push origin state-storage
 
