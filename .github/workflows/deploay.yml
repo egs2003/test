@@ -47,28 +47,20 @@ jobs:
           
       - name: Verschlüsselten State auf separaten Branch pushen (Manueller Git-Block) 💾
         run: |
-          # 1. Konfiguration des Benutzers für den Commit
           git config user.name "State Update Bot"
           git config user.email "actions@github.com"
           
-          # 2. Ziel-Branch holen (und Fehler ignorieren, falls er beim ersten Mal nicht existiert)
-          git fetch origin state-storage:state-storage || true
+          #git fetch origin state-storage:state-storage || true
           
-          # 3. Zum State-Branch wechseln
           git checkout state-storage || git checkout --orphan state-storage
           
-          # 4. Nur die State-Datei im Branch behalten (wichtig für Orphan Branches)
           git rm -rf .
           
-          # 5. Neue verschlüsselte Datei kopieren
           cp output/state_file.enc .
           
-          # 6. Datei hinzufügen und committen
           git add state_file.enc
           git commit -m "Auto-update encrypted state [skip ci]"
           
-          # 7. Pushen
-          # Wichtig: Wir pushen direkt mit dem GITHUB_TOKEN
           git push origin state-storage
           
         env:
