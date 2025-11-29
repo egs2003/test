@@ -40,7 +40,7 @@ jobs:
       - name: Kompilierung und Update der State-Datei
         # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
         run: |
-          cat state_file.json >> state_file.json
+          date >> state_file.json
         
       - name: Neuen State verschlüsseln (Nur wenn geändert) 🔒
         run: |
