@@ -35,6 +35,7 @@ jobs:
             rm state_file.enc
           fi
 
+          cat state_file.json
 
       - name: Kompilierung und Update der State-Datei
         # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
