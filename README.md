@@ -1,1 +1,0 @@
-![lastResult.md](lastResult.md)
