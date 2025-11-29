@@ -61,7 +61,6 @@ jobs:
           cp output/state_file.enc .
           
           git add state_file.enc
-          git add test.txt
           git commit -m "Auto-update encrypted state [skip ci]"
           
           git push origin state-storage
