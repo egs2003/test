@@ -1,33 +1,47 @@
-# This is a basic workflow to help you get started with Actions
+name: State Update with Review and Encryption
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches:
+      - main
+      
+# Konkurrenz-Kontrolle: Stellt sicher, dass nur ein Workflow-Lauf gleichzeitig aktiv ist.
+concurrency: 
+  group: workflow_state_update
+  cancel-in-progress: true 
 
+env:
+  ENC_KEY: ${{ secrets.STATE_ENCRYPTION_KEY }} # Encryption Key als Environment Variable
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+  # Job 1: Alten State holen, entschlüsseln und Vorprüfung durchführen
+  prepare_assessment:
+    runs-on: self-hosted
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Code auschecken
+        uses: actions/checkout@v4
+        
+      - name: Alten State holen & entschlüsseln
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          # 1. Branch holen
+          git fetch origin state-storage:state-storage || true
+          # 2. Verschlüsselte Datei auschecken. Fehlende Datei wird ignoriert.
+          git checkout state-storage -- state_file.enc 2>/dev/null || true
+          git checkout main 
+
+          # 3. Entschlüsseln, falls state_file.enc existiert
+          if [ -f state_file.enc ]; then
+            echo "Alten State entschlüsselt."
+            openssl aes-256-cbc -d -a -in state_file.enc -out state_file.json -pass env:ENC_KEY
+            rm state_file.enc
+          fi
+          
+      - name: Vorprüfung (Einschätzung) durchführen
+        # Ihr Skript liest state_file.json und schreibt eine Einschätzung in assessment.txt
+        run: echo "test" > assessment.txt
+          
+      - name: Einschätzung hochladen (Für die manuelle Prüfung)
+        uses: actions/upload-artifact@v4
+        with:
+          name: assessment-report
+          path: assessment.txt
