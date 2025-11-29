@@ -56,7 +56,7 @@ jobs:
           
           git checkout state-storage || git checkout --orphan state-storage
           
-          git rm -rf .
+          #git rm -rf .
           
           cp output/state_file.enc .
           
