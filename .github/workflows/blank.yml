@@ -41,7 +41,9 @@ jobs:
           
       - name: Vorprüfung (Einschätzung) durchführen
         # Ihr Skript liest state_file.json und schreibt eine Einschätzung in assessment.txt
-        run: echo "test123" > lastResult.md
+        run: |
+          echo "Last Result" > README.md
+          echo "test123" >> README.md
         
       - name: Vorprüfung speichern
         run: |
@@ -50,7 +52,7 @@ jobs:
           
           git checkout state-storage || git checkout --orphan state-storage
           
-          git add lastResult.md
+          git add README.md
           git commit -m "Vorprüfung [skip ci]"
           
           git push origin state-storage
