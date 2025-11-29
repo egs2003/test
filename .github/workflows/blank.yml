@@ -17,8 +17,6 @@ jobs:
   # Job 1: Alten State holen, entschlüsseln und Vorprüfung durchführen
   prepare_assessment:
     runs-on: self-hosted
-    outputs: 
-      state_available: ${{ steps.fetch_state.outputs.state_available }}
     steps:
       - name: Code auschecken
         uses: actions/checkout@v4
@@ -33,22 +31,11 @@ jobs:
             echo "Alten State entschlüsselt."
             openssl aes-256-cbc -d -a -in state_file.enc -out state_file.json -pass env:ENC_KEY
             rm state_file.enc
-            echo "state_available=true" >> $GITHUB_OUTPUT
-          else 
-            echo "Keine verschlüsselte Datei gefunden. State NICHT verfügbar (Erster Lauf)."
-            echo "state_available=false" >> $GITHUB_OUTPUT
           fi
           
       - name: Vorprüfung (Einschätzung) durchführen
         # Ihr Skript liest state_file.json und schreibt eine Einschätzung in assessment.txt
         run: echo "test" > assessment.txt
-        
-      - name: Klartext State hochladen (Für den nächsten Job)
-        if: steps.fetch_state.outputs.state_available == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: klartext-state
-          path: state_file.json
           
       - name: Einschätzung hochladen (Für die manuelle Prüfung)
         uses: actions/upload-artifact@v4
