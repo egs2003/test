@@ -46,7 +46,7 @@ jobs:
           openssl aes-256-cbc -a -salt -in state_file.json -out output/state_file.enc -pass env:ENC_KEY
           
       - name: Verschlüsselten State auf separaten Branch pushen 💾
-        uses: s0/git-publish-subdir-action@develop
+        uses: s0/git-publish-subdir-action@v2
         with:
           # VORHER: Der REPO-Parameter fehlte, obwohl er implizit "self" sein sollte
           # NEU: Definiert explizit das Ziel-Repository
