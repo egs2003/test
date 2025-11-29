@@ -2,6 +2,8 @@ name: Vorprüfung
 
 on:
   workflow_dispatch:
+    branches:
+      - main
   push:
     branches:
       - main
