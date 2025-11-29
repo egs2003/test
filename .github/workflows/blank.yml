@@ -45,3 +45,20 @@ jobs:
         with:
           name: assessment-report
           path: assessment.txt
+  manual_approval:
+    needs: prepare_assessment
+    runs-on: ubuntu-latest
+    environment: 
+      name: manuelle_bestaetigung 
+      
+    steps:
+      - name: Einschätzung für Reviewer herunterladen
+        uses: actions/download-artifact@v4
+        with:
+          name: assessment-report
+          path: .
+          
+      - name: Einschätzung im Log anzeigen
+        run: |
+          echo "--- BITTE assessment.txt PRÜFEN ---"
+          cat assessment.txt
