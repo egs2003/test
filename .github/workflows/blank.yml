@@ -72,28 +72,4 @@ jobs:
           echo "--- BITTE assessment.txt PRÜFEN ---"
           cat assessment.txt
           
-  compile_and_deploy:
-    needs: manual_approval 
-    runs-on: self-hosted
-    permissions:
-      contents: write 
-    steps:
-      - name: Code auschecken
-        uses: actions/checkout@v4
-        
-      - name: Klartext-State herunterladen (vom Job 1)
-        if: needs.prepare_assessment.outputs.state_available == 'true'
-        uses: actions/download-artifact@v4
-        with:
-          name: klartext-state
-          path: .
-          
-      - name: Zustand für Vergleich speichern
-        if: needs.prepare_assessment.outputs.state_available == 'true'
-        # Der heruntergeladene Zustand (state_file.json) ist der ALTE Zustand.
-        # Wir speichern ihn, bevor das Kompilierungsskript ihn verändert.
-        run: cp state_file.json old_state_for_comparison.json
-          
-      - name: Kompilierung und Update der State-Datei
-        # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
-        run: echo "next" >> state_file.json
+ 
