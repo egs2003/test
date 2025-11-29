@@ -35,23 +35,6 @@ jobs:
           
       - name: Vorprüfung (Einschätzung) durchführen
         # Ihr Skript liest state_file.json und schreibt eine Einschätzung in assessment.txt
-        run: echo "test123" > assessment.txt
+        run: echo "test123" > lastResult.md
           
-      - name: Einschätzung hochladen (Für die manuelle Prüfung)
-        uses: actions/upload-artifact@v4
-        with:
-          name: assessment-report
-          path: assessment.txt
-
-      - name: Einschätzung für Reviewer herunterladen
-        uses: actions/download-artifact@v4
-        with:
-          name: assessment-report
-          path: .
-          
-      - name: Einschätzung im Log anzeigen
-        run: |
-          echo "--- BITTE assessment.txt PRÜFEN ---"
-          cat assessment.txt
-          
- 
+    
