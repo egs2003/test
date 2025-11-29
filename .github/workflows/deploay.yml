@@ -33,9 +33,9 @@ jobs:
             echo "Alten State entschlüsselt."
             openssl aes-256-cbc -d -a -in state_file.enc -out state_file.json -pass env:ENC_KEY -pbkdf2
             rm state_file.enc
+            cat state_file.json
           fi
 
-          cat state_file.json
 
       - name: Kompilierung und Update der State-Datei
         # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
