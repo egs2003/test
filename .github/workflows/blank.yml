@@ -1,6 +1,7 @@
-name: State Update with Review and Encryption
+name: Vorprüfung
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
