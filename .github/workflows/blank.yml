@@ -56,4 +56,7 @@ jobs:
           git commit -m "Vorprüfung [skip ci]"
           
           git push origin state-storage
+        env:
+          # Wir verwenden den GITHUB_TOKEN als Environment Variable für die Authentifizierung
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
