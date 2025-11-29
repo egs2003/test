@@ -45,25 +45,32 @@ jobs:
           mkdir -p output
           openssl aes-256-cbc -a -salt -in state_file.json -out output/state_file.enc -pass env:ENC_KEY
           
-      - name: Verschlüsselten State auf separaten Branch pushen 💾
-        uses: s0/git-publish-subdir-action@v2
-        with:
-          # VORHER: Der REPO-Parameter fehlte, obwohl er implizit "self" sein sollte
-          # NEU: Definiert explizit das Ziel-Repository
-          repo: ${{ github.repository }} 
+      - name: Verschlüsselten State auf separaten Branch pushen (Manueller Git-Block) 💾
+        run: |
+          # 1. Konfiguration des Benutzers für den Commit
+          git config user.name "State Update Bot"
+          git config user.email "actions@github.com"
           
-          # NEU: Alternativ kann 'repo: self' verwendet werden, erfordert aber einen GITHUB_TOKEN in env
-          # repo: self 
-
-          # Der Ordner, der die finale State-Datei enthält
-          src: "output" 
-          # Der Branch, auf dem der State gespeichert wird
-          branch: "state-storage" 
-          # Die verschlüsselte Datei
-          file_pattern: state_file.enc
-          # Commit-Nachricht
-          commit_message: "Auto-update encrypted state [skip ci]"
+          # 2. Ziel-Branch holen (und Fehler ignorieren, falls er beim ersten Mal nicht existiert)
+          git fetch origin state-storage:state-storage || true
+          
+          # 3. Zum State-Branch wechseln
+          git checkout state-storage || git checkout --orphan state-storage
+          
+          # 4. Nur die State-Datei im Branch behalten (wichtig für Orphan Branches)
+          git rm -rf .
+          
+          # 5. Neue verschlüsselte Datei kopieren
+          cp output/state_file.enc .
+          
+          # 6. Datei hinzufügen und committen
+          git add state_file.enc
+          git commit -m "Auto-update encrypted state [skip ci]"
+          
+          # 7. Pushen
+          # Wichtig: Wir pushen direkt mit dem GITHUB_TOKEN
+          git push origin state-storage
           
         env:
-          # Der GITHUB_TOKEN muss in der env-Sektion verfügbar sein, um Push-Rechte zu haben.
+          # Wir verwenden den GITHUB_TOKEN als Environment Variable für die Authentifizierung
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
