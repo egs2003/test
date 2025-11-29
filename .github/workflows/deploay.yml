@@ -61,10 +61,7 @@ jobs:
           cp output/state_file.enc .
           
           git add state_file.enc
-          git commit -m "Auto-update encrypted state [skip ci]"
+          git commit -m "Auto-update encrypted state"
           
           git push origin state-storage
           
-        env:
-          # Wir verwenden den GITHUB_TOKEN als Environment Variable für die Authentifizierung
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
