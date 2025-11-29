@@ -39,7 +39,9 @@ jobs:
 
       - name: Kompilierung und Update der State-Datei
         # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
-        run: cat README.md >> state_file.json
+        run: |
+          cat README.md >> state_file.json
+          cat state_file.json >> test.txt
         
       - name: Neuen State verschlüsseln (Nur wenn geändert) 🔒
         run: |
@@ -60,6 +62,7 @@ jobs:
           cp output/state_file.enc .
           
           git add state_file.enc
+          git add test.txt
           git commit -m "Auto-update encrypted state [skip ci]"
           
           git push origin state-storage
