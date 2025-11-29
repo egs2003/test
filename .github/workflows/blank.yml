@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '.github/**'
+      - 'README.md'
       
 # Konkurrenz-Kontrolle: Stellt sicher, dass nur ein Workflow-Lauf gleichzeitig aktiv ist.
 concurrency: 
