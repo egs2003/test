@@ -39,6 +39,12 @@ jobs:
       - name: Vorprüfung (Einschätzung) durchführen
         # Ihr Skript liest state_file.json und schreibt eine Einschätzung in assessment.txt
         run: echo "test" > assessment.txt
+        
+      - name: Klartext State hochladen (Für den nächsten Job)
+        uses: actions/upload-artifact@v4
+        with:
+          name: klartext-state
+          path: state_file.json
           
       - name: Einschätzung hochladen (Für die manuelle Prüfung)
         uses: actions/upload-artifact@v4
@@ -47,10 +53,9 @@ jobs:
           path: assessment.txt
   manual_approval:
     needs: prepare_assessment
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     environment: 
       name: manuelle_bestaetigung 
-      
     steps:
       - name: Einschätzung für Reviewer herunterladen
         uses: actions/download-artifact@v4
@@ -62,3 +67,27 @@ jobs:
         run: |
           echo "--- BITTE assessment.txt PRÜFEN ---"
           cat assessment.txt
+          
+  compile_and_deploy:
+    needs: manual_approval 
+    runs-on: self-hosted
+    permissions:
+      contents: write 
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+        
+      - name: Klartext-State herunterladen (vom Job 1)
+        uses: actions/download-artifact@v4
+        with:
+          name: klartext-state
+          path: .
+          
+      - name: Zustand für Vergleich speichern
+        # Der heruntergeladene Zustand (state_file.json) ist der ALTE Zustand.
+        # Wir speichern ihn, bevor das Kompilierungsskript ihn verändert.
+        run: cp state_file.json old_state_for_comparison.json
+          
+      - name: Kompilierung und Update der State-Datei
+        # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
+        run: echo "next" >> state_file.json
