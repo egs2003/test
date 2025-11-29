@@ -29,7 +29,7 @@ jobs:
 
           if [ -f state_file.enc ]; then
             echo "Alten State entschlüsselt."
-            openssl aes-256-cbc -d -a -in state_file.enc -out state_file.json -pass env:ENC_KEY
+            openssl aes-256-cbc -d -a -in state_file.enc -out state_file.json -pass env:ENC_KEY -pbkdf2
             rm state_file.enc
           fi
           
