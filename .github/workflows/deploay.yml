@@ -27,7 +27,7 @@ jobs:
         run: |
           git fetch origin state-storage:state-storage || true
           git checkout state-storage -- state_file.enc 2>/dev/null || true
-          git checkout main 
+          #git checkout main 
 
           if [ -f state_file.enc ]; then
             echo "Alten State entschlüsselt."
@@ -39,7 +39,7 @@ jobs:
 
       - name: Kompilierung und Update der State-Datei
         # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
-        run: echo "next" >> state_file.json
+        run: cat README.md >> state_file.json
         
       - name: Neuen State verschlüsseln (Nur wenn geändert) 🔒
         run: |
