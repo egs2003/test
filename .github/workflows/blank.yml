@@ -43,7 +43,7 @@ jobs:
       - name: Vorprüfung (Einschätzung) durchführen
         id: assessment
         run: |
-          test = "test123"
+          test=$(echo "test123")
           echo "LastResult=$test" >> $GITHUB_OUTPUT
 
   manual_approval:
