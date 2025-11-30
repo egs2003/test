@@ -22,6 +22,7 @@ jobs:
     runs-on: self-hosted
     outputs:
       state_available: ${{ steps.fetch_state.outputs.state_available }}
+      assessment: ${{ steps.assessment.outputs }}
     steps:
       - name: Code auschecken
         uses: actions/checkout@v4
