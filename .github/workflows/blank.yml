@@ -56,7 +56,8 @@ jobs:
       - name: Einschätzung hochladen (Für die manuelle Prüfung)
         uses: actions/upload-artifact@v4
         with:
-          name: assessment.txt
+          name: assessment_report
+          path: assessment.txt
   manual_approval:
     needs: prepare_assessment
     runs-on: self-hosted
@@ -66,7 +67,8 @@ jobs:
       - name: Einschätzung für Reviewer herunterladen
         uses: actions/download-artifact@v4
         with:
-          name: assessment.txt
+          name: assessment_report
+          path: .
           
       - name: Einschätzung im Log anzeigen
         run: cat assessment.txt
