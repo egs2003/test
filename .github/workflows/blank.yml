@@ -22,7 +22,7 @@ jobs:
     runs-on: self-hosted
     outputs:
       state_available: ${{ steps.fetch_state.outputs.state_available }}
-      assessment: ${{ steps.assessment.outputs.LastResult }}
+      #assessment: ${{ steps.assessment.outputs.LastResult }}
     steps:
       - name: Code auschecken
         uses: actions/checkout@v4
@@ -41,10 +41,10 @@ jobs:
           fi
 
       - name: Vorprüfung (Einschätzung) durchführen
-        id: assessment
+      #  id: assessment
         run: |
           test=$(echo "test123")
-          echo "LastResult=$test" >> $GITHUB_OUTPUT
+          echo "LastResult=$test" >> $GITHUB_STEP_SUMMARY
 
   manual_approval:
     needs: prepare_assessment
@@ -52,8 +52,8 @@ jobs:
     environment: 
       name: approve
     steps:
-      - name: dummy
-        run: echo "Hallo Welt"
+      - name: Warte auf Genehmigung
+        run: echo "Warten auf manuelle Genehmigung..."
     
   compile_and_deploy:
     needs: manual_approval
