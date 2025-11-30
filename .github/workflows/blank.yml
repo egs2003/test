@@ -97,7 +97,7 @@ jobs:
       - name: Neuen State verschlüsseln (Nur wenn geändert) 🔒
         run: |
           mkdir -p output
-          openssl aes-256-cbc -a -salt -in state_file.json -out state_file.enc -pass env:ENC_KEY -pbkdf2
+          openssl aes-256-cbc -a -salt -in state_file.json -out output/state_file.enc -pass env:ENC_KEY -pbkdf2
           
       - name: Verschlüsselten State auf separaten Branch pushen (Manueller Git-Block) 💾
         run: |
@@ -105,6 +105,8 @@ jobs:
           git config user.email "actions@github.com"
           
           git checkout state-storage || git checkout --orphan state-storage
+
+          cp output/state_file.enc .
           
           git add state_file.enc
           git commit -m "Auto-update encrypted state"
