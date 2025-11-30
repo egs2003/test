@@ -18,7 +18,6 @@ env:
   ENC_KEY: ${{ secrets.STATE_ENCRYPTION_KEY }} # Encryption Key als Environment Variable
 
 jobs:
-  # Job 1: Alten State holen, entschlüsseln und Vorprüfung durchführen
   prepare_assessment:
     runs-on: self-hosted
     outputs:
@@ -54,7 +53,8 @@ jobs:
       name: approve
       url: test
       #description: "Bereitstellung der Version: ${{ needs.prepare_assessment.outputs.assessment }}"
-
+    steps:
+      - name: dummy
     
   compile_and_deploy:
     needs: manual_approval
