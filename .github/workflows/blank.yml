@@ -21,40 +21,96 @@ jobs:
   # Job 1: Alten State holen, entschlüsseln und Vorprüfung durchführen
   prepare_assessment:
     runs-on: self-hosted
-    permissions:
-      contents: write 
+    outputs:
+      state_available: ${{ steps.fetch_state.outputs.state_available }}
     steps:
       - name: Code auschecken
         uses: actions/checkout@v4
         
       - name: Alten State holen & entschlüsseln
+        id: fetch_state
         run: |
           git fetch origin state-storage:state-storage || true
           git checkout state-storage -- state_file.enc 2>/dev/null || true
-          #git checkout main 
 
           if [ -f state_file.enc ]; then
             echo "Alten State entschlüsselt."
             openssl aes-256-cbc -d -a -in state_file.enc -out state_file.json -pass env:ENC_KEY -pbkdf2
             rm state_file.enc
+            echo "state_available=true" >> $GITHUB_OUTPUT
           fi
-          
+
       - name: Vorprüfung (Einschätzung) durchführen
         # Ihr Skript liest state_file.json und schreibt eine Einschätzung in assessment.txt
         run: |
-          echo "# Last Result" > LastResult.md
-          echo "test123" >> LastResult.md
+          echo "# Last Result" > assessment.txt
+          echo "test123" >> assessment.txt
+
+      - name: State hochladen
+        if: steps.fetch_state.outputs.state_available == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: klartext_state
+          path: state_file.json
+      
+      - name: Einschätzung hochladen (Für die manuelle Prüfung)
+        uses: actions/upload-artifact@v4
+        with:
+          name: assessment.txt
+  manual_approval:
+    needs: prepare_assessment
+    runs-on: self-hosted
+    environment: 
+      name: approve
+    steps:
+      - name: Einschätzung für Reviewer herunterladen
+        uses: actions/download-artifact@v4
+        with:
+          name: assessment-report
+          path: .
+          
+      - name: Einschätzung im Log anzeigen
+        run: cat assessment.txt
+  compile_and_deploy:
+    needs: manual_approval
+    runs-on: self-hosted
+    permissions:
+      contents: write
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
         
-      - name: Vorprüfung speichern
+      - name: Klartext-State herunterladen (vom Job 1)
+        # Dieser Schritt wird nur ausgeführt, da der Job nur bei State-Verfügbarkeit startet
+        uses: actions/download-artifact@v4
+        with:
+          name: klartext_state
+          path: .
+
+      - name: Kompilierung und Update der State-Datei
+        # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
+        run: |
+          date >> state_file.json
+          cat state_file.json
+
+      - name: Neuen State verschlüsseln (Nur wenn geändert) 🔒
+        run: |
+          mkdir -p output
+          openssl aes-256-cbc -a -salt -in state_file.json -out state_file.enc -pass env:ENC_KEY -pbkdf2
+          
+      - name: Verschlüsselten State auf separaten Branch pushen (Manueller Git-Block) 💾
         run: |
           git config user.name "State Update Bot"
           git config user.email "actions@github.com"
           
           git checkout state-storage || git checkout --orphan state-storage
           
-          git add LastResult.md
-          git commit -m "Vorprüfung"
+          git add state_file.enc
+          git commit -m "Auto-update encrypted state"
           
           git push origin state-storage
+        
+  
+    
 
     
