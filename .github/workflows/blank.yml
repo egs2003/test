@@ -52,6 +52,7 @@ jobs:
       name: approve
     steps:
       - name: dummy
+        run: echo "Hallo Welt"
     
   compile_and_deploy:
     needs: manual_approval
