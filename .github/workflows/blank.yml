@@ -23,6 +23,7 @@ jobs:
     runs-on: self-hosted
     outputs:
       state_available: ${{ steps.fetch_state.outputs.state_available }}
+      assessment: ${{ steps.assessment.outputs.VERSION }}
     steps:
       - name: Code auschecken
         uses: actions/checkout@v4
@@ -41,37 +42,20 @@ jobs:
           fi
 
       - name: Vorprüfung (Einschätzung) durchführen
-        # Ihr Skript liest state_file.json und schreibt eine Einschätzung in assessment.txt
+        id: assessment
         run: |
-          echo "# Last Result" > assessment.txt
-          echo "test123" >> assessment.txt
-
-      - name: State hochladen
-        if: steps.fetch_state.outputs.state_available == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: klartext_state
-          path: state_file.json
+          echo "# Last Result" >> $GITHUB_OUTPUT
+          echo "test123" >> $GITHUB_OUTPUT
       
-      - name: Einschätzung hochladen (Für die manuelle Prüfung)
-        uses: actions/upload-artifact@v4
-        with:
-          name: assessment_report
-          path: assessment.txt
   manual_approval:
     needs: prepare_assessment
     runs-on: self-hosted
     environment: 
       name: approve
-    steps:
-      - name: Einschätzung für Reviewer herunterladen
-        uses: actions/download-artifact@v4
-        with:
-          name: assessment_report
-          path: .
-          
-      - name: Einschätzung im Log anzeigen
-        run: cat assessment.txt
+      url: test
+      #description: "Bereitstellung der Version: ${{ needs.prepare_assessment.outputs.assessment }}"
+
+    
   compile_and_deploy:
     needs: manual_approval
     runs-on: self-hosted
@@ -81,12 +65,18 @@ jobs:
       - name: Code auschecken
         uses: actions/checkout@v4
         
-      - name: Klartext-State herunterladen (vom Job 1)
-        # Dieser Schritt wird nur ausgeführt, da der Job nur bei State-Verfügbarkeit startet
-        uses: actions/download-artifact@v4
-        with:
-          name: klartext_state
-          path: .
+      - name: Alten State holen & entschlüsseln
+        id: fetch_state
+        run: |
+          git fetch origin state-storage:state-storage || true
+          git checkout state-storage -- state_file.enc 2>/dev/null || true
+
+          if [ -f state_file.enc ]; then
+            echo "Alten State entschlüsselt."
+            openssl aes-256-cbc -d -a -in state_file.enc -out state_file.json -pass env:ENC_KEY -pbkdf2
+            rm state_file.enc
+            echo "state_available=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Kompilierung und Update der State-Datei
         # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
