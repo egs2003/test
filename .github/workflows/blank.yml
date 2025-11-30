@@ -45,63 +45,6 @@ jobs:
           echo "# Last Result" >> $GITHUB_OUTPUT
           echo "test123" >> $GITHUB_OUTPUT
       
-  manual_approval:
-    needs: prepare_assessment
-    runs-on: self-hosted
-    environment: 
-      name: approve
-      url: test
-      #description: "Bereitstellung der Version: ${{ needs.prepare_assessment.outputs.assessment }}"
-    steps:
-      - name: dummy
-    
-  compile_and_deploy:
-    needs: manual_approval
-    runs-on: self-hosted
-    permissions:
-      contents: write
-    steps:
-      - name: Code auschecken
-        uses: actions/checkout@v4
-        
-      - name: Alten State holen & entschlüsseln
-        id: fetch_state
-        run: |
-          git fetch origin state-storage:state-storage || true
-          git checkout state-storage -- state_file.enc 2>/dev/null || true
-
-          if [ -f state_file.enc ]; then
-            echo "Alten State entschlüsselt."
-            openssl aes-256-cbc -d -a -in state_file.enc -out state_file.json -pass env:ENC_KEY -pbkdf2
-            rm state_file.enc
-            echo "state_available=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Kompilierung und Update der State-Datei
-        # Ihr Hauptskript aktualisiert nun state_file.json (den NEUEN Zustand)
-        run: |
-          date >> state_file.json
-          cat state_file.json
-
-      - name: Neuen State verschlüsseln (Nur wenn geändert) 🔒
-        run: |
-          mkdir -p output
-          openssl aes-256-cbc -a -salt -in state_file.json -out output/state_file.enc -pass env:ENC_KEY -pbkdf2
-          
-      - name: Verschlüsselten State auf separaten Branch pushen (Manueller Git-Block) 💾
-        run: |
-          git config user.name "State Update Bot"
-          git config user.email "actions@github.com"
-          
-          git checkout state-storage || git checkout --orphan state-storage
-
-          cp output/state_file.enc .
-          
-          git add state_file.enc
-          git commit -m "Auto-update encrypted state"
-          
-          git push origin state-storage
-        
   
     
 
