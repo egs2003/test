@@ -45,19 +45,12 @@ jobs:
         run: |
           test=$(echo "test123")
           echo "LastResult=$test" >> $GITHUB_STEP_SUMMARY
-
-  manual_approval:
+    
+  compile_and_deploy:
     needs: prepare_assessment
     runs-on: self-hosted
     environment: 
       name: approve
-    steps:
-      - name: Warte auf Genehmigung
-        run: echo "Warten auf manuelle Genehmigung..."
-    
-  compile_and_deploy:
-    needs: manual_approval
-    runs-on: self-hosted
     permissions:
       contents: write
     steps:
