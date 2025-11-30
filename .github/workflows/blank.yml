@@ -50,7 +50,6 @@ jobs:
     runs-on: self-hosted
     environment: 
       name: approve
-      #description: "Bereitstellung der Version: ${{ needs.prepare_assessment.outputs.assessment }}"
     steps:
       - name: dummy
     
